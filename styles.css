@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #f4f7ef;
   --card: #ffffff;
   --ink: #1f2a22;
@@ -205,3 +205,4 @@ menu {
     grid-template-columns: 1fr;
   }
 }
+
