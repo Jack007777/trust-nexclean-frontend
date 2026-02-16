@@ -1,4 +1,4 @@
-﻿const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL
+const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL
   ? window.APP_CONFIG.API_BASE_URL
   : "").replace(/\/+$/, "");
 
@@ -68,7 +68,7 @@ async function login() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
-  if (!res.ok) throw new Error("用户名或密码错误");
+  if (!res.ok) throw new Error("\u7528\u6237\u540d\u6216\u5bc6\u7801\u9519\u8bef");
   const data = await res.json();
   state.token = data.access_token;
   state.role = data.role;
@@ -131,8 +131,8 @@ function renderRows(items) {
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
-        <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>编辑</button>
-        <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>删除</button>
+        <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
+        <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>\u5220\u9664</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -142,7 +142,7 @@ function renderRows(items) {
 async function loadMeta() {
   const data = await api("/api/meta");
   const sel = $("countrySelect");
-  sel.innerHTML = `<option value="">全部国家</option>`;
+  sel.innerHTML = `<option value="">\u5168\u90e8\u56fd\u5bb6</option>`;
   data.countries.forEach((c) => {
     const opt = document.createElement("option");
     opt.value = c;
@@ -167,9 +167,9 @@ async function loadData() {
   const data = await api(`/api/customers?${qs.toString()}`);
   state.total = data.total;
   renderRows(data.items);
-  $("stats").textContent = `总计 ${data.total} 条`;
+  $("stats").textContent = `\u603b\u8ba1 ${data.total} \u6761`;
   const totalPages = Math.max(1, Math.ceil(data.total / state.pageSize));
-  $("pageInfo").textContent = `第 ${state.page} / ${totalPages} 页`;
+  $("pageInfo").textContent = `\u7b2c ${state.page} / ${totalPages} \u9875`;
   $("prevBtn").disabled = state.page <= 1;
   $("nextBtn").disabled = state.page >= totalPages;
 }
@@ -230,7 +230,7 @@ function bindEvents() {
 
   $("addBtn").onclick = () => {
     state.editingId = null;
-    $("dialogTitle").textContent = "新增客户";
+    $("dialogTitle").textContent = "\u65b0\u589e\u5ba2\u6237";
     fillForm(null);
     $("editorDialog").showModal();
   };
@@ -240,15 +240,15 @@ function bindEvents() {
       .map((tr) => Number(tr.children[0].textContent))
       .filter((x) => Number.isFinite(x) && x > 0);
     if (!ids.length) {
-      alert("当前页没有可处理数据");
+      alert("\u5f53\u524d\u9875\u6ca1\u6709\u53ef\u5904\u7406\u6570\u636e");
       return;
     }
-    if (!confirm(`将尝试定位当前页 ${ids.length} 条客户，继续？`)) return;
+    if (!confirm(`\u5c06\u5c1d\u8bd5\u5b9a\u4f4d\u5f53\u524d\u9875 ${ids.length} \u6761\u5ba2\u6237\uff0c\u7ee7\u7eed\uff1f`)) return;
     const r = await api("/api/customers/geocode", {
       method: "POST",
       body: JSON.stringify({ ids, pause_sec: 0.8 }),
     });
-    alert(`定位完成：更新 ${r.updated}，未命中 ${r.missed}，错误 ${r.errors}`);
+    alert(`\u5b9a\u4f4d\u5b8c\u6210\uff1a\u66f4\u65b0 ${r.updated}\uff0c\u672a\u547d\u4e2d ${r.missed}\uff0c\u9519\u8bef ${r.errors}`);
     await loadData();
   };
 
@@ -263,12 +263,12 @@ function bindEvents() {
       max_rows: 1000,
       pause_sec: 0.8,
     };
-    if (!confirm("将自动定位当前筛选结果（最多 1000 条），继续？")) return;
+    if (!confirm("\u5c06\u81ea\u52a8\u5b9a\u4f4d\u5f53\u524d\u7b5b\u9009\u7ed3\u679c\uff08\u6700\u591a 1000 \u6761\uff09\uff0c\u7ee7\u7eed\uff1f")) return;
     const r = await api("/api/customers/geocode-filter", {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    alert(`定位完成：选中 ${r.selected}，更新 ${r.updated}，未命中 ${r.missed}，错误 ${r.errors}`);
+    alert(`\u5b9a\u4f4d\u5b8c\u6210\uff1a\u9009\u4e2d ${r.selected}\uff0c\u66f4\u65b0 ${r.updated}\uff0c\u672a\u547d\u4e2d ${r.missed}\uff0c\u9519\u8bef ${r.errors}`);
     await loadData();
   };
 
@@ -279,12 +279,12 @@ function bindEvents() {
     if (btn.dataset.act === "edit") {
       const detail = await api(`/api/customers/${id}`);
       state.editingId = id;
-      $("dialogTitle").textContent = "编辑客户";
+      $("dialogTitle").textContent = "\u7f16\u8f91\u5ba2\u6237";
       fillForm(detail.item);
       $("editorDialog").showModal();
     }
     if (btn.dataset.act === "del") {
-      if (!confirm("确认删除这条记录？")) return;
+      if (!confirm("\u786e\u8ba4\u5220\u9664\u8fd9\u6761\u8bb0\u5f55\uff1f")) return;
       await api(`/api/customers/${id}`, { method: "DELETE" });
       await loadData();
     }
@@ -294,7 +294,7 @@ function bindEvents() {
     e.preventDefault();
     const payload = collectForm();
     if (!payload.company_name) {
-      alert("公司名称不能为空");
+      alert("\u516c\u53f8\u540d\u79f0\u4e0d\u80fd\u4e3a\u7a7a");
       return;
     }
     if (state.editingId) {
@@ -350,7 +350,7 @@ function ensureMap() {
     pickedLatLng = e.latlng;
     if (!mapMarker) mapMarker = L.marker(e.latlng).addTo(map);
     else mapMarker.setLatLng(e.latlng);
-    $("mapHint").textContent = `已选择: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+    $("mapHint").textContent = `\u5df2\u9009\u62e9: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
   });
 }
 
@@ -366,7 +366,7 @@ function openMapDialog() {
     if (!mapMarker) mapMarker = L.marker(ll).addTo(map);
     else mapMarker.setLatLng(ll);
     map.setView(ll, 12);
-    $("mapHint").textContent = `当前坐标: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    $("mapHint").textContent = `\u5f53\u524d\u5750\u6807: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
   }
 }
 
@@ -377,7 +377,7 @@ async function mapSearch() {
   const res = await fetch(u, { headers: { "Accept-Language": "en" } });
   const data = await res.json();
   if (!data.length) {
-    alert("未找到地点");
+    alert("\u672a\u627e\u5230\u5730\u70b9");
     return;
   }
   const lat = Number(data[0].lat);
@@ -386,7 +386,7 @@ async function mapSearch() {
   if (!mapMarker) mapMarker = L.marker(pickedLatLng).addTo(map);
   else mapMarker.setLatLng(pickedLatLng);
   map.setView(pickedLatLng, 13);
-  $("mapHint").textContent = `搜索结果: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+  $("mapHint").textContent = `\u641c\u7d22\u7ed3\u679c: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 }
 
 function applyPickedLatLng() {
