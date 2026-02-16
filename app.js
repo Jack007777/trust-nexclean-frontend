@@ -17,6 +17,7 @@ const state = {
   missingGeoOnly: false,
   editingId: null,
 };
+
 let map;
 let mapMarker;
 let pickedLatLng = null;
@@ -67,7 +68,7 @@ async function login() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
-  if (!res.ok) throw new Error("ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯");
+  if (!res.ok) throw new Error("用户名或密码错误");
   const data = await res.json();
   state.token = data.access_token;
   state.role = data.role;
@@ -130,8 +131,8 @@ function renderRows(items) {
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
-        <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>ç¼–è¾‘</button>
-        <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>åˆ é™¤</button>
+        <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>编辑</button>
+        <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>删除</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -141,7 +142,7 @@ function renderRows(items) {
 async function loadMeta() {
   const data = await api("/api/meta");
   const sel = $("countrySelect");
-  sel.innerHTML = `<option value="">å…¨éƒ¨å›½å®¶</option>`;
+  sel.innerHTML = `<option value="">全部国家</option>`;
   data.countries.forEach((c) => {
     const opt = document.createElement("option");
     opt.value = c;
@@ -166,9 +167,9 @@ async function loadData() {
   const data = await api(`/api/customers?${qs.toString()}`);
   state.total = data.total;
   renderRows(data.items);
-  $("stats").textContent = `æ€»è®¡ ${data.total} æ¡`;
+  $("stats").textContent = `总计 ${data.total} 条`;
   const totalPages = Math.max(1, Math.ceil(data.total / state.pageSize));
-  $("pageInfo").textContent = `ç¬¬ ${state.page} / ${totalPages} é¡µ`;
+  $("pageInfo").textContent = `第 ${state.page} / ${totalPages} 页`;
   $("prevBtn").disabled = state.page <= 1;
   $("nextBtn").disabled = state.page >= totalPages;
 }
@@ -194,6 +195,7 @@ function bindEvents() {
     state.page = 1;
     await loadData();
   };
+
   $("resetBtn").onclick = async () => {
     $("searchInput").value = "";
     $("countrySelect").value = "";
@@ -210,12 +212,14 @@ function bindEvents() {
     state.page = 1;
     await loadData();
   };
+
   $("prevBtn").onclick = async () => {
     if (state.page > 1) {
       state.page--;
       await loadData();
     }
   };
+
   $("nextBtn").onclick = async () => {
     const totalPages = Math.max(1, Math.ceil(state.total / state.pageSize));
     if (state.page < totalPages) {
@@ -226,24 +230,25 @@ function bindEvents() {
 
   $("addBtn").onclick = () => {
     state.editingId = null;
-    $("dialogTitle").textContent = "æ–°å¢žå®¢æˆ·";
+    $("dialogTitle").textContent = "新增客户";
     fillForm(null);
     $("editorDialog").showModal();
   };
+
   $("geocodePageBtn").onclick = async () => {
     const ids = [...$("customersTable").querySelectorAll("tbody tr")]
       .map((tr) => Number(tr.children[0].textContent))
       .filter((x) => Number.isFinite(x) && x > 0);
     if (!ids.length) {
-      alert("å½“å‰é¡µæ²¡æœ‰å¯å¤„ç†æ•°æ®");
+      alert("当前页没有可处理数据");
       return;
     }
-    if (!confirm(`å°†å°è¯•å®šä½å½“å‰é¡µ ${ids.length} æ¡å®¢æˆ·ï¼Œç»§ç»­ï¼Ÿ`)) return;
+    if (!confirm(`将尝试定位当前页 ${ids.length} 条客户，继续？`)) return;
     const r = await api("/api/customers/geocode", {
       method: "POST",
       body: JSON.stringify({ ids, pause_sec: 0.8 }),
     });
-    alert(`å®šä½å®Œæˆï¼šæ›´æ–° ${r.updated}ï¼Œæœªå‘½ä¸­ ${r.missed}ï¼Œé”™è¯¯ ${r.errors}`);
+    alert(`定位完成：更新 ${r.updated}，未命中 ${r.missed}，错误 ${r.errors}`);
     await loadData();
   };
 
@@ -258,12 +263,12 @@ function bindEvents() {
       max_rows: 1000,
       pause_sec: 0.8,
     };
-    if (!confirm("?????????????? 1000 ??????")) return;
+    if (!confirm("将自动定位当前筛选结果（最多 1000 条），继续？")) return;
     const r = await api("/api/customers/geocode-filter", {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    alert(`??????? ${r.selected}??? ${r.updated}???? ${r.missed}??? ${r.errors}`);
+    alert(`定位完成：选中 ${r.selected}，更新 ${r.updated}，未命中 ${r.missed}，错误 ${r.errors}`);
     await loadData();
   };
 
@@ -274,12 +279,12 @@ function bindEvents() {
     if (btn.dataset.act === "edit") {
       const detail = await api(`/api/customers/${id}`);
       state.editingId = id;
-      $("dialogTitle").textContent = "ç¼–è¾‘å®¢æˆ·";
+      $("dialogTitle").textContent = "编辑客户";
       fillForm(detail.item);
       $("editorDialog").showModal();
     }
     if (btn.dataset.act === "del") {
-      if (!confirm("ç¡®è®¤åˆ é™¤è¿™æ¡è®°å½•ï¼Ÿ")) return;
+      if (!confirm("确认删除这条记录？")) return;
       await api(`/api/customers/${id}`, { method: "DELETE" });
       await loadData();
     }
@@ -289,7 +294,7 @@ function bindEvents() {
     e.preventDefault();
     const payload = collectForm();
     if (!payload.company_name) {
-      alert("å…¬å¸åç§°ä¸èƒ½ä¸ºç©º");
+      alert("公司名称不能为空");
       return;
     }
     if (state.editingId) {
@@ -334,9 +339,6 @@ async function initApp() {
   }
 }
 
-bindEvents();
-initApp();
-
 function ensureMap() {
   if (map) return;
   map = L.map("mapCanvas").setView([52.52, 13.405], 4);
@@ -348,7 +350,7 @@ function ensureMap() {
     pickedLatLng = e.latlng;
     if (!mapMarker) mapMarker = L.marker(e.latlng).addTo(map);
     else mapMarker.setLatLng(e.latlng);
-    $("mapHint").textContent = `å·²é€‰æ‹©: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+    $("mapHint").textContent = `已选择: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
   });
 }
 
@@ -364,7 +366,7 @@ function openMapDialog() {
     if (!mapMarker) mapMarker = L.marker(ll).addTo(map);
     else mapMarker.setLatLng(ll);
     map.setView(ll, 12);
-    $("mapHint").textContent = `å½“å‰åæ ‡: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    $("mapHint").textContent = `当前坐标: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
   }
 }
 
@@ -375,7 +377,7 @@ async function mapSearch() {
   const res = await fetch(u, { headers: { "Accept-Language": "en" } });
   const data = await res.json();
   if (!data.length) {
-    alert("æœªæ‰¾åˆ°åœ°ç‚¹");
+    alert("未找到地点");
     return;
   }
   const lat = Number(data[0].lat);
@@ -384,7 +386,7 @@ async function mapSearch() {
   if (!mapMarker) mapMarker = L.marker(pickedLatLng).addTo(map);
   else mapMarker.setLatLng(pickedLatLng);
   map.setView(pickedLatLng, 13);
-  $("mapHint").textContent = `æœç´¢ç»“æžœ: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+  $("mapHint").textContent = `搜索结果: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 }
 
 function applyPickedLatLng() {
@@ -394,3 +396,5 @@ function applyPickedLatLng() {
   $("mapDialog").close();
 }
 
+bindEvents();
+initApp();

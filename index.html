@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
@@ -18,40 +18,40 @@
       <h1>Trust Customers</h1>
       <div id="userBox" class="user-box hidden">
         <span id="userLabel"></span>
-        <button id="logoutBtn" class="secondary">é€€å‡º</button>
+        <button id="logoutBtn" class="secondary">退出</button>
       </div>
     </header>
 
     <main>
       <section id="loginPanel" class="card">
-        <h2>å›¢é˜Ÿç™»å½•</h2>
+        <h2>团队登录</h2>
         <div class="form-row">
-          <label>ç”¨æˆ·å</label>
+          <label>用户名</label>
           <input id="loginUser" value="admin" />
         </div>
         <div class="form-row">
-          <label>å¯†ç </label>
+          <label>密码</label>
           <input id="loginPass" type="password" value="admin123" />
         </div>
-        <button id="loginBtn">ç™»å½•</button>
-        <p class="hint">é¦–æ¬¡ç™»å½•åŽè¯·ä¿®æ”¹é»˜è®¤å¯†ç ï¼ˆç”Ÿäº§çŽ¯å¢ƒåŠ¡å¿…æ”¹ï¼‰ã€‚</p>
+        <button id="loginBtn">登录</button>
+        <p class="hint">首次上线请修改管理员默认密码。</p>
       </section>
 
       <section id="appPanel" class="hidden">
         <section class="card controls">
-          <input id="searchInput" placeholder="æœç´¢å…¬å¸/è”ç³»äºº/é‚®ç®±/å¤‡æ³¨..." />
+          <input id="searchInput" placeholder="搜索公司/联系人/邮箱/备注..." />
           <select id="countrySelect">
-            <option value="">å…¨éƒ¨å›½å®¶</option>
+            <option value="">全部国家</option>
           </select>
-          <input id="centerLatInput" placeholder="ä¸­å¿ƒçº¬åº¦ (å¦‚ 52.52)" />
-          <input id="centerLngInput" placeholder="ä¸­å¿ƒç»åº¦ (å¦‚ 13.40)" />
-          <input id="radiusKmInput" placeholder="åŠå¾„ km (å¦‚ 20)" />
-          <label class="checkline"><input id="missingGeoOnlyInput" type="checkbox" /> ä»…æœªå®šä½å®¢æˆ·</label>
-          <button id="searchBtn">æœç´¢</button>
-          <button id="resetBtn" class="secondary">é‡ç½®</button>
-          <button id="geocodePageBtn" class="secondary">è‡ªåŠ¨å®šä½æœ¬é¡µ</button>
-          <button id="geocodeFilteredBtn" class="secondary">è‡ªåŠ¨å®šä½ç­›é€‰ç»“æžœ</button>
-          <button id="addBtn" class="accent">æ–°å¢ž</button>
+          <input id="centerLatInput" placeholder="中心纬度 (如 52.52)" />
+          <input id="centerLngInput" placeholder="中心经度 (如 13.40)" />
+          <input id="radiusKmInput" placeholder="半径 km (如 20)" />
+          <label class="checkline"><input id="missingGeoOnlyInput" type="checkbox" /> 仅未定位客户</label>
+          <button id="searchBtn">搜索</button>
+          <button id="resetBtn" class="secondary">重置</button>
+          <button id="geocodePageBtn" class="secondary">自动定位本页</button>
+          <button id="geocodeFilteredBtn" class="secondary">自动定位筛选结果</button>
+          <button id="addBtn" class="accent">新增</button>
         </section>
 
         <section class="card meta">
@@ -63,16 +63,16 @@
             <thead>
               <tr>
                 <th>ID</th>
-                <th>å…¬å¸</th>
-                <th>è”ç³»äºº</th>
-                <th>ç”µè¯</th>
-                <th>é‚®ç®±</th>
-                <th>å›½å®¶</th>
-                <th>çº¬åº¦</th>
-                <th>ç»åº¦</th>
-                <th>å¤‡æ³¨</th>
-                <th>æ¥æº</th>
-                <th>æ“ä½œ</th>
+                <th>公司</th>
+                <th>联系人</th>
+                <th>电话</th>
+                <th>邮箱</th>
+                <th>国家</th>
+                <th>纬度</th>
+                <th>经度</th>
+                <th>备注</th>
+                <th>来源</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -80,53 +80,53 @@
         </section>
 
         <section class="pager">
-          <button id="prevBtn" class="secondary">ä¸Šä¸€é¡µ</button>
+          <button id="prevBtn" class="secondary">上一页</button>
           <span id="pageInfo"></span>
-          <button id="nextBtn" class="secondary">ä¸‹ä¸€é¡µ</button>
+          <button id="nextBtn" class="secondary">下一页</button>
         </section>
       </section>
     </main>
 
     <dialog id="editorDialog">
       <form id="editorForm" method="dialog">
-        <h3 id="dialogTitle">ç¼–è¾‘å®¢æˆ·</h3>
+        <h3 id="dialogTitle">编辑客户</h3>
         <div class="grid">
-          <label>å…¬å¸<input name="company_name" required /></label>
-          <label>è”ç³»äºº<input name="contact_name" /></label>
-          <label>ç”µè¯<input name="phone" /></label>
-          <label>ç½‘å€<input name="website" /></label>
-          <label>é‚®ç®±<input name="email" /></label>
-          <label>èŽ·å®¢æ¸ é“<input name="lead_source" /></label>
-          <label>å›½å®¶<input name="country" /></label>
-          <label>è¡—é“<input name="street" /></label>
-          <label>åŸŽå¸‚<input name="city" /></label>
-          <label>é‚®ç¼–<input name="postcode" /></label>
-          <label>åœ°ç‚¹<input name="location" /></label>
-          <label>çº¬åº¦<input name="latitude" type="number" step="any" /></label>
-          <label>ç»åº¦<input name="longitude" type="number" step="any" /></label>
-          <label><button type="button" id="openMapBtn" class="secondary">åœ°å›¾é€‰ç‚¹</button></label>
-          <label>æ¥æºæ–‡ä»¶<input name="source_file" /></label>
-          <label>å·¥ä½œè¡¨<input name="sheet_name" /></label>
-          <label>æºè¡Œå·<input name="source_row" type="number" min="0" /></label>
-          <label class="full">å¤‡æ³¨<textarea name="note" rows="3"></textarea></label>
+          <label>公司<input name="company_name" required /></label>
+          <label>联系人<input name="contact_name" /></label>
+          <label>电话<input name="phone" /></label>
+          <label>网址<input name="website" /></label>
+          <label>邮箱<input name="email" /></label>
+          <label>获客渠道<input name="lead_source" /></label>
+          <label>国家<input name="country" /></label>
+          <label>街道<input name="street" /></label>
+          <label>城市<input name="city" /></label>
+          <label>邮编<input name="postcode" /></label>
+          <label>地点<input name="location" /></label>
+          <label>纬度<input name="latitude" type="number" step="any" /></label>
+          <label>经度<input name="longitude" type="number" step="any" /></label>
+          <label><button type="button" id="openMapBtn" class="secondary">地图选点</button></label>
+          <label>来源文件<input name="source_file" /></label>
+          <label>工作表<input name="sheet_name" /></label>
+          <label>源行号<input name="source_row" type="number" min="0" /></label>
+          <label class="full">备注<textarea name="note" rows="3"></textarea></label>
         </div>
         <menu>
-          <button value="cancel" class="secondary">å–æ¶ˆ</button>
-          <button id="saveBtn" value="default">ä¿å­˜</button>
+          <button value="cancel" class="secondary">取消</button>
+          <button id="saveBtn" value="default">保存</button>
         </menu>
       </form>
     </dialog>
 
     <dialog id="mapDialog">
       <div class="map-toolbar">
-        <input id="mapSearchInput" placeholder="æœç´¢åœ°ç‚¹ï¼ˆå¦‚ Berlin, Germanyï¼‰" />
-        <button id="mapSearchBtn">æœç´¢</button>
-        <button id="mapUseBtn" class="accent">ä½¿ç”¨æ­¤åæ ‡</button>
+        <input id="mapSearchInput" placeholder="搜索地点（如 Berlin, Germany）" />
+        <button id="mapSearchBtn">搜索</button>
+        <button id="mapUseBtn" class="accent">使用此坐标</button>
       </div>
       <div id="mapCanvas"></div>
-      <div id="mapHint">ç‚¹å‡»åœ°å›¾é€‰æ‹©ä½ç½®</div>
+      <div id="mapHint">点击地图选择位置</div>
       <menu>
-        <button id="mapCloseBtn" class="secondary">å…³é—­</button>
+        <button id="mapCloseBtn" class="secondary">关闭</button>
       </menu>
     </dialog>
 
@@ -139,4 +139,3 @@
     <script src="./app.js"></script>
   </body>
 </html>
-
