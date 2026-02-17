@@ -1,4 +1,4 @@
-const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL
+﻿const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL
   ? window.APP_CONFIG.API_BASE_URL
   : "").replace(/\/+$/, "");
 
@@ -11,19 +11,19 @@ const state = {
   total: 0,
   search: "",
   country: "",
+  nearText: "",
   centerLat: "",
   centerLng: "",
-  radiusKm: "",
-  missingGeoOnly: false,
+  radiusKm: "20",
   editingId: null,
   commCustomerId: null,
 };
 
-let map;
-let mapMarker;
-let pickedLatLng = null;
-
 const $ = (id) => document.getElementById(id);
+
+function fullUrl(path) {
+  return `${API_BASE}${path}`;
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -32,10 +32,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function fullUrl(path) {
-  return `${API_BASE}${path}`;
 }
 
 async function api(path, options = {}) {
@@ -136,12 +132,10 @@ function renderRows(items) {
       <td>${item.phone || ""}</td>
       <td>${item.email || ""}</td>
       <td>${item.country || ""}</td>
-      <td>${item.latitude ?? ""}</td>
-      <td>${item.longitude ?? ""}</td>
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
-        <button data-id="${item.id}" data-act="comm">Comm</button>
+        <button data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
         <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
         <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>\u5220\u9664</button>
       </td>
@@ -162,6 +156,14 @@ async function loadMeta() {
   });
 }
 
+async function resolveCenterFromNear(nearText) {
+  const u = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(nearText)}`;
+  const res = await fetch(u, { headers: { "Accept-Language": "en" } });
+  const data = await res.json();
+  if (!data.length) return null;
+  return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+}
+
 async function loadData() {
   const qs = new URLSearchParams({
     page: String(state.page),
@@ -169,7 +171,6 @@ async function loadData() {
   });
   if (state.search) qs.set("search", state.search);
   if (state.country) qs.set("country", state.country);
-  if (state.missingGeoOnly) qs.set("missing_geo", "true");
   if (state.centerLat && state.centerLng && state.radiusKm) {
     qs.set("center_lat", state.centerLat);
     qs.set("center_lng", state.centerLng);
@@ -194,15 +195,27 @@ function bindEvents() {
       alert(e.message);
     }
   };
+
   $("logoutBtn").onclick = () => logout();
 
   $("searchBtn").onclick = async () => {
     state.search = $("searchInput").value.trim();
     state.country = $("countrySelect").value;
-    state.centerLat = $("centerLatInput").value.trim();
-    state.centerLng = $("centerLngInput").value.trim();
-    state.radiusKm = $("radiusKmInput").value.trim();
-    state.missingGeoOnly = $("missingGeoOnlyInput").checked;
+    state.nearText = $("nearInput").value.trim();
+    state.radiusKm = $("radiusKmSelect").value || "20";
+
+    state.centerLat = "";
+    state.centerLng = "";
+    if (state.nearText) {
+      const p = await resolveCenterFromNear(state.nearText);
+      if (!p) {
+        alert("\u672a\u627e\u5230\u4f4d\u7f6e\uff0c\u8bf7\u6362\u4e2a\u5173\u952e\u8bcd");
+        return;
+      }
+      state.centerLat = String(p.lat);
+      state.centerLng = String(p.lng);
+    }
+
     state.page = 1;
     await loadData();
   };
@@ -210,16 +223,14 @@ function bindEvents() {
   $("resetBtn").onclick = async () => {
     $("searchInput").value = "";
     $("countrySelect").value = "";
-    $("centerLatInput").value = "";
-    $("centerLngInput").value = "";
-    $("radiusKmInput").value = "";
-    $("missingGeoOnlyInput").checked = false;
+    $("nearInput").value = "";
+    $("radiusKmSelect").value = "20";
     state.search = "";
     state.country = "";
+    state.nearText = "";
     state.centerLat = "";
     state.centerLng = "";
-    state.radiusKm = "";
-    state.missingGeoOnly = false;
+    state.radiusKm = "20";
     state.page = 1;
     await loadData();
   };
@@ -246,57 +257,25 @@ function bindEvents() {
     $("editorDialog").showModal();
   };
 
-  $("geocodePageBtn").onclick = async () => {
-    const ids = [...$("customersTable").querySelectorAll("tbody tr")]
-      .map((tr) => Number(tr.children[0].textContent))
-      .filter((x) => Number.isFinite(x) && x > 0);
-    if (!ids.length) {
-      alert("\u5f53\u524d\u9875\u6ca1\u6709\u53ef\u5904\u7406\u6570\u636e");
-      return;
-    }
-    if (!confirm(`\u5c06\u5c1d\u8bd5\u5b9a\u4f4d\u5f53\u524d\u9875 ${ids.length} \u6761\u5ba2\u6237\uff0c\u7ee7\u7eed\uff1f`)) return;
-    const r = await api("/api/customers/geocode", {
-      method: "POST",
-      body: JSON.stringify({ ids, pause_sec: 0.8 }),
-    });
-    alert(`\u5b9a\u4f4d\u5b8c\u6210\uff1a\u66f4\u65b0 ${r.updated}\uff0c\u672a\u547d\u4e2d ${r.missed}\uff0c\u9519\u8bef ${r.errors}`);
-    await loadData();
-  };
-
-  $("geocodeFilteredBtn").onclick = async () => {
-    const payload = {
-      search: $("searchInput").value.trim() || null,
-      country: $("countrySelect").value || null,
-      missing_geo: $("missingGeoOnlyInput").checked,
-      center_lat: $("centerLatInput").value.trim() ? Number($("centerLatInput").value.trim()) : null,
-      center_lng: $("centerLngInput").value.trim() ? Number($("centerLngInput").value.trim()) : null,
-      radius_km: $("radiusKmInput").value.trim() ? Number($("radiusKmInput").value.trim()) : null,
-      max_rows: 1000,
-      pause_sec: 0.8,
-    };
-    if (!confirm("\u5c06\u81ea\u52a8\u5b9a\u4f4d\u5f53\u524d\u7b5b\u9009\u7ed3\u679c\uff08\u6700\u591a 1000 \u6761\uff09\uff0c\u7ee7\u7eed\uff1f")) return;
-    const r = await api("/api/customers/geocode-filter", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    alert(`\u5b9a\u4f4d\u5b8c\u6210\uff1a\u9009\u4e2d ${r.selected}\uff0c\u66f4\u65b0 ${r.updated}\uff0c\u672a\u547d\u4e2d ${r.missed}\uff0c\u9519\u8bef ${r.errors}`);
-    await loadData();
-  };
-
   $("customersTable").onclick = async (e) => {
     const btn = e.target.closest("button[data-id]");
     if (!btn) return;
     const id = Number(btn.dataset.id);
+
+    if (btn.dataset.act === "comm") {
+      await openCommDialog(id);
+      return;
+    }
+
     if (btn.dataset.act === "edit") {
       const detail = await api(`/api/customers/${id}`);
       state.editingId = id;
       $("dialogTitle").textContent = "\u7f16\u8f91\u5ba2\u6237";
       fillForm(detail.item);
       $("editorDialog").showModal();
+      return;
     }
-    if (btn.dataset.act === "comm") {
-      await openCommDialog(id);
-    }
+
     if (btn.dataset.act === "del") {
       if (!confirm("\u786e\u8ba4\u5220\u9664\u8fd9\u6761\u8bb0\u5f55\uff1f")) return;
       await api(`/api/customers/${id}`, { method: "DELETE" });
@@ -325,11 +304,6 @@ function bindEvents() {
     $("editorDialog").close();
     await loadData();
   };
-
-  $("openMapBtn").onclick = () => openMapDialog();
-  $("mapCloseBtn").onclick = () => $("mapDialog").close();
-  $("mapSearchBtn").onclick = async () => mapSearch();
-  $("mapUseBtn").onclick = () => applyPickedLatLng();
 
   $("commCloseBtn").onclick = () => $("commDialog").close();
   $("commForm").onsubmit = async (e) => {
@@ -422,63 +396,6 @@ async function initApp() {
   } catch {
     logout();
   }
-}
-
-function ensureMap() {
-  if (map) return;
-  map = L.map("mapCanvas").setView([52.52, 13.405], 4);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
-  map.on("click", (e) => {
-    pickedLatLng = e.latlng;
-    if (!mapMarker) mapMarker = L.marker(e.latlng).addTo(map);
-    else mapMarker.setLatLng(e.latlng);
-    $("mapHint").textContent = `\u5df2\u9009\u62e9: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
-  });
-}
-
-function openMapDialog() {
-  $("mapDialog").showModal();
-  ensureMap();
-  setTimeout(() => map.invalidateSize(), 50);
-  const lat = parseFloat($("editorForm").elements["latitude"].value);
-  const lng = parseFloat($("editorForm").elements["longitude"].value);
-  if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-    const ll = L.latLng(lat, lng);
-    pickedLatLng = ll;
-    if (!mapMarker) mapMarker = L.marker(ll).addTo(map);
-    else mapMarker.setLatLng(ll);
-    map.setView(ll, 12);
-    $("mapHint").textContent = `\u5f53\u524d\u5750\u6807: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-  }
-}
-
-async function mapSearch() {
-  const q = $("mapSearchInput").value.trim();
-  if (!q) return;
-  const u = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
-  const res = await fetch(u, { headers: { "Accept-Language": "en" } });
-  const data = await res.json();
-  if (!data.length) {
-    alert("\u672a\u627e\u5230\u5730\u70b9");
-    return;
-  }
-  const lat = Number(data[0].lat);
-  const lng = Number(data[0].lon);
-  pickedLatLng = L.latLng(lat, lng);
-  if (!mapMarker) mapMarker = L.marker(pickedLatLng).addTo(map);
-  else mapMarker.setLatLng(pickedLatLng);
-  map.setView(pickedLatLng, 13);
-  $("mapHint").textContent = `\u641c\u7d22\u7ed3\u679c: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-}
-
-function applyPickedLatLng() {
-  if (!pickedLatLng) return;
-  $("editorForm").elements["latitude"].value = pickedLatLng.lat.toFixed(6);
-  $("editorForm").elements["longitude"].value = pickedLatLng.lng.toFixed(6);
-  $("mapDialog").close();
 }
 
 bindEvents();

@@ -1,51 +1,40 @@
 ﻿:root {
-  --bg: #f4f7ef;
+  --bg: #f3f5f2;
   --card: #ffffff;
-  --ink: #1f2a22;
-  --accent: #116466;
-  --accent-2: #2c8f76;
-  --line: #dfe7dc;
+  --ink: #1d2b20;
+  --line: #dde5de;
+  --green: #7ecb2f;
+  --green-dark: #2f7d14;
+  --btn: #0f6b67;
+  --btn-2: #0b5a57;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: "Segoe UI", "Noto Sans SC", sans-serif;
   color: var(--ink);
-  background: radial-gradient(circle at 10% 10%, #e7f7ef 0, var(--bg) 45%);
-}
-
-.bg-shape {
-  position: fixed;
-  right: -120px;
-  top: -120px;
-  width: 360px;
-  height: 360px;
-  background: linear-gradient(135deg, #8bd4c7, #59a78f);
-  border-radius: 50%;
-  opacity: 0.35;
-  z-index: -1;
+  background: var(--bg);
 }
 
 .topbar {
-  max-width: 1200px;
-  margin: 16px auto;
+  max-width: 1320px;
+  margin: 20px auto 12px;
   padding: 0 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-h1 {
-  margin: 0;
-  font-size: 30px;
+.brand {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
 }
 
 main {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto 24px;
   padding: 0 16px;
 }
@@ -58,9 +47,57 @@ main {
   margin-bottom: 12px;
 }
 
-.controls {
+.search-strip {
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(0deg, var(--green), #9adc3f);
+  padding: 10px;
+}
+
+.search-main {
+  background: #fff;
+  border-radius: 999px;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto auto auto;
+  grid-template-columns: 2.2fr 1.1fr 1.3fr 0.9fr auto;
+  align-items: center;
+  gap: 0;
+  overflow: hidden;
+}
+
+.search-main > * {
+  border: 0;
+  border-right: 1px solid #e7ece7;
+  border-radius: 0;
+  height: 52px;
+  font-size: 16px;
+  padding: 0 14px;
+}
+
+.search-main > *:last-child {
+  border-right: 0;
+}
+
+.search-main input,
+.search-main select {
+  outline: none;
+  background: #fff;
+}
+
+.find-btn {
+  height: 44px;
+  margin: 4px;
+  border-radius: 999px;
+  background: var(--green-dark);
+  color: #fff;
+  font-weight: 700;
+  padding: 0 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.search-actions {
+  margin-top: 10px;
+  display: flex;
   gap: 10px;
 }
 
@@ -76,21 +113,17 @@ button {
 
 button {
   cursor: pointer;
-  background: var(--accent);
+  background: var(--btn);
   color: #fff;
   border: none;
 }
 
-button:hover {
-  background: var(--accent-2);
-}
+button:hover { background: var(--btn-2); }
+button.secondary { background: #7c8f7c; }
+button.accent { background: #0b7a75; }
 
-button.secondary {
-  background: #7c8f7c;
-}
-
-button.accent {
-  background: #0b7a75;
+.login-card {
+  max-width: 480px;
 }
 
 .form-row {
@@ -99,29 +132,14 @@ button.accent {
   margin-bottom: 10px;
 }
 
-.checkline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.hint {
-  font-size: 12px;
-  color: #556;
-}
-
-.table-wrap {
-  overflow: auto;
-}
+.table-wrap { overflow: auto; }
 
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th,
-td {
+th, td {
   border-bottom: 1px solid var(--line);
   padding: 8px;
   text-align: left;
@@ -155,9 +173,7 @@ th {
   font-size: 13px;
 }
 
-.grid .full {
-  grid-column: 1 / -1;
-}
+.grid .full { grid-column: 1 / -1; }
 
 menu {
   display: flex;
@@ -173,29 +189,7 @@ menu {
   align-items: center;
 }
 
-.hidden {
-  display: none !important;
-}
-
-#mapCanvas {
-  width: min(900px, 88vw);
-  height: 420px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-.map-toolbar {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-#mapHint {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #556;
-}
+.hidden { display: none !important; }
 
 .comm-list {
   margin-top: 10px;
@@ -235,12 +229,25 @@ menu {
   font-size: 13px;
 }
 
-@media (max-width: 900px) {
-  .controls {
+@media (max-width: 1000px) {
+  .search-main {
     grid-template-columns: 1fr;
+    border-radius: 12px;
+  }
+  .search-main > * {
+    border-right: 0;
+    border-bottom: 1px solid #e7ece7;
+    height: 48px;
+  }
+  .search-main > *:last-child {
+    border-bottom: 0;
+  }
+  .find-btn {
+    border-radius: 10px;
+    margin: 8px;
+    height: 44px;
   }
   .grid {
     grid-template-columns: 1fr;
   }
 }
-

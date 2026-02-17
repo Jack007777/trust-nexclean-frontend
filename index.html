@@ -1,21 +1,14 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Trust Customers</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
   </head>
   <body>
-    <div class="bg-shape"></div>
     <header class="topbar">
-      <h1>Trust Customers</h1>
+      <div class="brand">Trust Customers</div>
       <div id="userBox" class="user-box hidden">
         <span id="userLabel"></span>
         <button id="logoutBtn" class="secondary">退出</button>
@@ -23,7 +16,7 @@
     </header>
 
     <main>
-      <section id="loginPanel" class="card">
+      <section id="loginPanel" class="card login-card">
         <h2>团队登录</h2>
         <div class="form-row">
           <label>用户名</label>
@@ -34,24 +27,28 @@
           <input id="loginPass" type="password" value="admin123" />
         </div>
         <button id="loginBtn">登录</button>
-        <p class="hint">首次上线请修改管理员默认密码。</p>
       </section>
 
       <section id="appPanel" class="hidden">
-        <section class="card controls">
-          <input id="searchInput" placeholder="搜索公司/联系人/邮箱/备注..." />
-          <select id="countrySelect">
-            <option value="">全部国家</option>
-          </select>
-          <input id="centerLatInput" placeholder="中心纬度 (如 52.52)" />
-          <input id="centerLngInput" placeholder="中心经度 (如 13.40)" />
-          <input id="radiusKmInput" placeholder="半径 km (如 20)" />
-          <label class="checkline"><input id="missingGeoOnlyInput" type="checkbox" /> 仅未定位客户</label>
-          <button id="searchBtn">搜索</button>
-          <button id="resetBtn" class="secondary">重置</button>
-          <button id="geocodePageBtn" class="secondary">自动定位本页</button>
-          <button id="geocodeFilteredBtn" class="secondary">自动定位筛选结果</button>
-          <button id="addBtn" class="accent">新增</button>
+        <section class="search-strip card">
+          <div class="search-main">
+            <input id="searchInput" class="search-keyword" placeholder="搜索公司/联系人/邮箱/备注" />
+            <select id="countrySelect" class="search-country">
+              <option value="">全部国家</option>
+            </select>
+            <input id="nearInput" class="search-near" placeholder="位置（城市/邮编，如 Worms）" />
+            <select id="radiusKmSelect" class="search-radius">
+              <option value="10">+ 10 km</option>
+              <option value="20" selected>+ 20 km</option>
+              <option value="50">+ 50 km</option>
+              <option value="100">+ 100 km</option>
+            </select>
+            <button id="searchBtn" class="find-btn">搜索</button>
+          </div>
+          <div class="search-actions">
+            <button id="resetBtn" class="secondary">重置</button>
+            <button id="addBtn" class="accent">新增客户</button>
+          </div>
         </section>
 
         <section class="card meta">
@@ -68,8 +65,6 @@
                 <th>电话</th>
                 <th>邮箱</th>
                 <th>国家</th>
-                <th>纬度</th>
-                <th>经度</th>
                 <th>备注</th>
                 <th>来源</th>
                 <th>操作</th>
@@ -101,14 +96,14 @@
           <label>街道<input name="street" /></label>
           <label>城市<input name="city" /></label>
           <label>邮编<input name="postcode" /></label>
-          <label>地点<input name="location" /></label>
-          <label>纬度<input name="latitude" type="number" step="any" /></label>
-          <label>经度<input name="longitude" type="number" step="any" /></label>
-          <label><button type="button" id="openMapBtn" class="secondary">地图选点</button></label>
+          <label class="full">地点<input name="location" /></label>
           <label>来源文件<input name="source_file" /></label>
           <label>工作表<input name="sheet_name" /></label>
           <label>源行号<input name="source_row" type="number" min="0" /></label>
           <label class="full">备注<textarea name="note" rows="3"></textarea></label>
+
+          <input type="hidden" name="latitude" />
+          <input type="hidden" name="longitude" />
         </div>
         <menu>
           <button value="cancel" class="secondary">取消</button>
@@ -119,42 +114,24 @@
 
     <dialog id="commDialog">
       <form id="commForm" method="dialog">
-        <h3 id="commTitle">Customer Communications</h3>
+        <h3 id="commTitle">客户沟通记录</h3>
         <div class="grid">
-          <label>Channel<input id="commChannel" placeholder="email / phone / meeting" /></label>
-          <label>Contact<input id="commContact" placeholder="name" /></label>
-          <label class="full">Subject<input id="commSubject" placeholder="subject" /></label>
-          <label class="full">Content<textarea id="commContent" rows="4" placeholder="communication details"></textarea></label>
-          <label>Happened At<input id="commHappenedAt" placeholder="2026-02-17T10:30:00" /></label>
-          <label>Next Follow-up<input id="commFollowUpAt" placeholder="2026-02-25T09:00:00" /></label>
+          <label>渠道<input id="commChannel" placeholder="email / phone / meeting" /></label>
+          <label>联系人<input id="commContact" placeholder="name" /></label>
+          <label class="full">主题<input id="commSubject" placeholder="subject" /></label>
+          <label class="full">内容<textarea id="commContent" rows="4" placeholder="communication details"></textarea></label>
+          <label>沟通时间<input id="commHappenedAt" placeholder="2026-02-17T10:30:00" /></label>
+          <label>下次跟进<input id="commFollowUpAt" placeholder="2026-02-25T09:00:00" /></label>
         </div>
         <menu>
-          <button id="commCloseBtn" type="button" class="secondary">Close</button>
-          <button id="commSaveBtn" value="default">Add Record</button>
+          <button id="commCloseBtn" type="button" class="secondary">关闭</button>
+          <button id="commSaveBtn" value="default">新增记录</button>
         </menu>
       </form>
       <section id="commList" class="comm-list"></section>
     </dialog>
 
-    <dialog id="mapDialog">
-      <div class="map-toolbar">
-        <input id="mapSearchInput" placeholder="搜索地点（如 Berlin, Germany）" />
-        <button id="mapSearchBtn">搜索</button>
-        <button id="mapUseBtn" class="accent">使用此坐标</button>
-      </div>
-      <div id="mapCanvas"></div>
-      <div id="mapHint">点击地图选择位置</div>
-      <menu>
-        <button id="mapCloseBtn" class="secondary">关闭</button>
-      </menu>
-    </dialog>
-
     <script src="./config.js"></script>
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
     <script src="./app.js"></script>
   </body>
 </html>
