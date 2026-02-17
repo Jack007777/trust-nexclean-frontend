@@ -61,9 +61,7 @@ main {
 }
 
 .meta {
-  position: sticky;
-  top: calc(var(--sticky-top) + var(--sticky-search-h));
-  z-index: 35;
+  position: static;
 }
 .search-main {
   background: #fff;
@@ -177,7 +175,7 @@ th, td {
 th {
   background: #f1f6f1;
   position: sticky;
-  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h));
+  top: calc(var(--sticky-top) + var(--sticky-search-h) + 4px);
   z-index: 50;
 }
 
