@@ -136,10 +136,10 @@ function renderRows(items) {
       <td>${item.contact_name || ""}</td>
       <td>${item.phone || ""}</td>
       <td>${item.email || ""}</td>
+      <td>${item.match_score === null || item.match_score === undefined || item.match_score === "" ? "" : `${Number(item.match_score)}星`}</td>
       <td>${item.country_group || item.country || ""}</td>
       <td>${item.city || ""}</td>
       <td>${item.postcode || ""}</td>
-      <td>${item.match_score === null || item.match_score === undefined || item.match_score === "" ? "" : `${Number(item.match_score)}星`}</td>
       <td>${item.trust_direct_customer ? "是" : ""}</td>
       <td>${item.business_description || ""}</td>
       <td>${item.note || ""}</td>
