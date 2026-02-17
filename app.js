@@ -154,6 +154,18 @@ function renderRows(items) {
   }
 }
 
+function refreshStickyOffsets() {
+  const root = document.documentElement;
+  const topPx = 8;
+  const search = document.querySelector(".search-strip");
+  const meta = document.querySelector(".meta");
+  const searchH = search ? Math.ceil(search.getBoundingClientRect().height) : 0;
+  const metaH = meta ? Math.ceil(meta.getBoundingClientRect().height) : 0;
+  root.style.setProperty("--sticky-top", `${topPx}px`);
+  root.style.setProperty("--sticky-search-h", `${searchH}px`);
+  root.style.setProperty("--sticky-meta-h", `${metaH}px`);
+}
+
 async function loadMeta() {
   const data = await api("/api/meta");
   const sel = $("countrySelect");
@@ -227,10 +239,13 @@ async function loadData() {
   $("pageInfo").textContent = `\u7b2c ${state.page} / ${totalPages} \u9875`;
   $("prevBtn").disabled = state.page <= 1;
   $("nextBtn").disabled = state.page >= totalPages;
+  refreshStickyOffsets();
   return data;
 }
 
 function bindEvents() {
+  window.addEventListener("resize", refreshStickyOffsets);
+
   $("loginBtn").onclick = async () => {
     try {
       await login();
@@ -452,8 +467,11 @@ async function initApp() {
     $("appPanel").classList.remove("hidden");
     $("userBox").classList.remove("hidden");
     $("addBtn").disabled = !(state.role === "admin" || state.role === "editor");
+    refreshStickyOffsets();
     await loadMeta();
     await loadData();
+    requestAnimationFrame(refreshStickyOffsets);
+    setTimeout(refreshStickyOffsets, 120);
   } catch {
     logout();
   }
