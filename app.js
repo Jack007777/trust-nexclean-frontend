@@ -143,6 +143,7 @@ function renderRows(items) {
       <td>${item.trust_direct_customer ? "是" : ""}</td>
       <td>${item.business_description || ""}</td>
       <td>${item.note || ""}</td>
+      <td>${item.lead_source || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
         <button data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
