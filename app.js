@@ -192,11 +192,19 @@ async function loadData() {
   const data = await api(`/api/customers?${qs.toString()}`);
   state.total = data.total;
   renderRows(data.items);
-  $("stats").textContent = `\u603b\u8ba1 ${data.total} \u6761`;
+  let msg = `\u603b\u8ba1 ${data.total} \u6761`;
+  if (state.nearText) {
+    msg += ` | \u4f4d\u7f6e ${state.nearText} \u00b1 ${state.radiusKm} km`;
+  }
+  if (data.total === 0) {
+    msg += " | \u672a\u627e\u5230\u5339\u914d\u5ba2\u6237";
+  }
+  $("stats").textContent = msg;
   const totalPages = Math.max(1, Math.ceil(data.total / state.pageSize));
   $("pageInfo").textContent = `\u7b2c ${state.page} / ${totalPages} \u9875`;
   $("prevBtn").disabled = state.page <= 1;
   $("nextBtn").disabled = state.page >= totalPages;
+  return data;
 }
 
 function bindEvents() {
@@ -213,6 +221,7 @@ function bindEvents() {
 
   $("searchBtn").onclick = async () => {
     try {
+      $("stats").textContent = "\u6b63\u5728\u641c\u7d22...";
       state.search = $("searchInput").value.trim();
       state.country = $("countrySelect").value;
       state.nearText = $("nearInput").value.trim();
@@ -223,6 +232,7 @@ function bindEvents() {
       if (state.nearText) {
         const p = await resolveCenterFromNear(state.nearText);
         if (!p) {
+          $("stats").textContent = "\u672a\u627e\u5230\u4f4d\u7f6e\uff0c\u8bf7\u6362\u4e2a\u5173\u952e\u8bcd";
           alert("\u672a\u627e\u5230\u4f4d\u7f6e\uff0c\u8bf7\u6362\u4e2a\u5173\u952e\u8bcd");
           return;
         }
@@ -231,8 +241,16 @@ function bindEvents() {
       }
 
       state.page = 1;
-      await loadData();
+      const first = await loadData();
+
+      if (state.nearText && state.country && first.total === 0) {
+        const countryBak = state.country;
+        state.country = "";
+        const second = await loadData();
+        $("stats").textContent = `\u603b\u8ba1 ${second.total} \u6761 | \u4f4d\u7f6e ${state.nearText} \u00b1 ${state.radiusKm} km | \u5df2\u5ffd\u7565\u56fd\u5bb6\u7b5b\u9009(${countryBak})`;
+      }
     } catch (e) {
+      $("stats").textContent = `\u641c\u7d22\u5931\u8d25: ${e.message || e}`;
       alert(`\u641c\u7d22\u5931\u8d25: ${e.message || e}`);
     }
   };
