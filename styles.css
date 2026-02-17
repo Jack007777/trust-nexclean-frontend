@@ -7,6 +7,9 @@
   --green-dark: #2f7d14;
   --btn: #0f6b67;
   --btn-2: #0b5a57;
+  --sticky-top: 8px;
+  --sticky-search-h: 102px;
+  --sticky-meta-h: 56px;
 }
 
 * { box-sizing: border-box; }
@@ -52,8 +55,16 @@ main {
   border: none;
   background: linear-gradient(0deg, var(--green), #9adc3f);
   padding: 10px;
+  position: sticky;
+  top: var(--sticky-top);
+  z-index: 40;
 }
 
+.meta {
+  position: sticky;
+  top: calc(var(--sticky-top) + var(--sticky-search-h));
+  z-index: 35;
+}
 .search-main {
   background: #fff;
   border-radius: 999px;
@@ -163,7 +174,8 @@ th, td {
 th {
   background: #f1f6f1;
   position: sticky;
-  top: 0;
+  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h));
+  z-index: 20;
 }
 
 .pager {
@@ -243,6 +255,10 @@ menu {
 }
 
 @media (max-width: 1000px) {
+  :root {
+    --sticky-search-h: 320px;
+    --sticky-meta-h: 56px;
+  }
   .search-main {
     grid-template-columns: 1fr;
     border-radius: 12px;
@@ -264,3 +280,5 @@ menu {
     grid-template-columns: 1fr;
   }
 }
+
+
