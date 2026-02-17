@@ -141,10 +141,16 @@ button {
 button:hover { background: var(--btn-2); }
 button.secondary { background: #7c8f7c; }
 button.accent { background: #0b7a75; }
-.comm-btn.has-record { background: #1f6feb; }
-.comm-btn.has-record:hover { background: #1a5dcb; }
-.comm-btn.no-record { background: #8a9891; }
-.comm-btn.no-record:hover { background: #76847d; }
+button[data-act="comm"] { background: #8a9891 !important; }
+button[data-act="comm"]:hover { background: #76847d !important; }
+.comm-btn.has-record,
+button[data-act="comm"].has-record { background: #1f6feb !important; }
+.comm-btn.has-record:hover,
+button[data-act="comm"].has-record:hover { background: #1a5dcb !important; }
+.comm-btn.no-record,
+button[data-act="comm"].no-record { background: #8a9891 !important; }
+.comm-btn.no-record:hover,
+button[data-act="comm"].no-record:hover { background: #76847d !important; }
 
 .login-card {
   max-width: 480px;
