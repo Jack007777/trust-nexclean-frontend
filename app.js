@@ -146,11 +146,30 @@ function renderRows(items) {
       <td>${item.lead_source || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
-        <button data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
+        <button class="comm-btn no-record" data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
         <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
       </td>
     `;
     tbody.appendChild(tr);
+  }
+}
+
+async function refreshCommunicationBadges(items) {
+  const checks = items.map(async (item) => {
+    try {
+      const data = await api(`/api/customers/${item.id}/communications?limit=1`);
+      return { id: item.id, has: (Number(data?.total || 0) > 0) };
+    } catch {
+      return { id: item.id, has: false };
+    }
+  });
+
+  const results = await Promise.all(checks);
+  for (const r of results) {
+    const btn = document.querySelector(`button[data-act="comm"][data-id="${r.id}"]`);
+    if (!btn) continue;
+    btn.classList.toggle("has-record", !!r.has);
+    btn.classList.toggle("no-record", !r.has);
   }
 }
 
@@ -224,6 +243,7 @@ async function loadData() {
   const data = await api(`/api/customers?${qs.toString()}`);
   state.total = data.total;
   renderRows(data.items);
+  refreshCommunicationBadges(data.items);
   let msg = `\u603b\u8ba1 ${data.total} \u6761`;
   if (state.nearText) {
     msg += ` | \u4f4d\u7f6e ${state.nearText} \u00b1 ${state.radiusKm} km`;

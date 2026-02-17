@@ -141,6 +141,10 @@ button {
 button:hover { background: var(--btn-2); }
 button.secondary { background: #7c8f7c; }
 button.accent { background: #0b7a75; }
+.comm-btn.has-record { background: #1f6feb; }
+.comm-btn.has-record:hover { background: #1a5dcb; }
+.comm-btn.no-record { background: #8a9891; }
+.comm-btn.no-record:hover { background: #76847d; }
 
 .login-card {
   max-width: 480px;
