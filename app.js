@@ -128,7 +128,6 @@ function renderRows(items) {
   for (const item of items) {
     const tr = document.createElement("tr");
     const canEdit = state.role === "admin" || state.role === "editor";
-    const canDelete = state.role === "admin";
     tr.innerHTML = `
       <td>${item.id}</td>
       <td>${item.company_name || ""}</td>
@@ -145,7 +144,6 @@ function renderRows(items) {
       <td>
         <button data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
         <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
-        <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>\u5220\u9664</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -340,11 +338,6 @@ function bindEvents() {
       return;
     }
 
-    if (btn.dataset.act === "del") {
-      if (!confirm("\u786e\u8ba4\u5220\u9664\u8fd9\u6761\u8bb0\u5f55\uff1f")) return;
-      await api(`/api/customers/${id}`, { method: "DELETE" });
-      await loadData();
-    }
   };
 
   $("editorForm").onsubmit = async (e) => {
