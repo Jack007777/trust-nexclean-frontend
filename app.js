@@ -157,9 +157,10 @@ async function loadMeta() {
   });
 
   cityHints.innerHTML = "";
-  (data.cities || []).forEach((city) => {
+  const hints = (data.place_hints && data.place_hints.length ? data.place_hints : data.cities) || [];
+  hints.forEach((v) => {
     const opt = document.createElement("option");
-    opt.value = city;
+    opt.value = v;
     cityHints.appendChild(opt);
   });
 }
