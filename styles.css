@@ -161,7 +161,8 @@ button.accent { background: #0b7a75; }
 }
 
 table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -172,6 +173,21 @@ th, td {
   text-align: left;
   vertical-align: top;
   font-size: 13px;
+}
+
+/* Keep the action column always visible on the right */
+#customersTable th:last-child,
+#customersTable td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 130;
+  background: #f1f6f1;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+#customersTable td:last-child {
+  background: #ffffff;
 }
 
 #customersTable thead {
