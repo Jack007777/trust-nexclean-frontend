@@ -134,7 +134,9 @@ function renderRows(items) {
       <td>${item.contact_name || ""}</td>
       <td>${item.phone || ""}</td>
       <td>${item.email || ""}</td>
-      <td>${item.country || ""}</td>
+      <td>${item.country_group || item.country || ""}</td>
+      <td>${item.city || ""}</td>
+      <td>${item.postcode || ""}</td>
       <td>${item.trust_direct_customer ? "是" : ""}</td>
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
@@ -270,32 +272,6 @@ function bindEvents() {
     } catch (e) {
       $("stats").textContent = `\u641c\u7d22\u5931\u8d25: ${e.message || e}`;
       alert(`\u641c\u7d22\u5931\u8d25: ${e.message || e}`);
-    }
-  };
-
-  $("geocodeFilteredBtn").onclick = async () => {
-    try {
-      const payload = {
-        search: $("searchInput").value.trim() || null,
-        country: $("countrySelect").value || null,
-        missing_geo: true,
-        center_lat: state.centerLat ? Number(state.centerLat) : null,
-        center_lng: state.centerLng ? Number(state.centerLng) : null,
-        radius_km: state.radiusKm ? Number(state.radiusKm) : null,
-        max_rows: 1000,
-        pause_sec: 0.8,
-      };
-      if (!confirm("将按当前筛选自动补齐缺失经纬度（最多1000条），继续？")) return;
-      $("stats").textContent = "正在自动补齐经纬度...";
-      const r = await api("/api/customers/geocode-filter", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      alert(`补齐完成：选中 ${r.selected}，更新 ${r.updated}，未命中 ${r.missed}，错误 ${r.errors}`);
-      await loadData();
-    } catch (e) {
-      $("stats").textContent = `补齐失败: ${e.message || e}`;
-      alert(`补齐失败: ${e.message || e}`);
     }
   };
 
