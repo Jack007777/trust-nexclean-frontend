@@ -337,9 +337,27 @@ function bindEvents() {
         alert("\u8bf7\u8f93\u5165 2-50 \u7684\u6574\u6570");
         return;
       }
+      const detailRaw = prompt(
+        "\u53ef\u9009\uff1a\u6309\u884c\u8f93\u5165\u7ad9\u70b9\u8be6\u7ec6\u5730\u5740\\n\u683c\u5f0f\uff1a\u57ce\u5e02| \u90ae\u7f16| \u8857\u9053\u5730\u5740\\n\u793a\u4f8b\uff1aKlingenberg|01774|Am Rittergut 6\\n\u7559\u7a7a\u5219\u4ec5\u6309\u6570\u91cf\u62c6\u5206"
+      );
+      const payload = { total_sites: totalSites };
+      if (detailRaw && detailRaw.trim()) {
+        const lines = detailRaw
+          .split(/\r?\n/)
+          .map((x) => x.trim())
+          .filter(Boolean);
+        if (lines.length !== totalSites) {
+          alert(`\u4f60\u8f93\u5165\u4e86 ${lines.length} \u884c\uff0c\u4f46\u603b\u7ad9\u70b9\u662f ${totalSites}\u3002\u8bf7\u91cd\u8bd5\u3002`);
+          return;
+        }
+        payload.sites = lines.map((line) => {
+          const [city, postcode, street] = line.split("|").map((x) => (x || "").trim());
+          return { city: city || null, postcode: postcode || null, street: street || null, country: "德国" };
+        });
+      }
       await api(`/api/customers/${id}/split-sites`, {
         method: "POST",
-        body: JSON.stringify({ total_sites: totalSites }),
+        body: JSON.stringify(payload),
       });
       alert(`\u5df2\u62c6\u5206\u4e3a ${totalSites} \u4e2a\u7ad9\u70b9\uff08\u4fdd\u7559\u539f\u8bb0\u5f55\uff0c\u65b0\u589e ${totalSites - 1} \u6761\uff09`);
       await loadData();
