@@ -36,7 +36,8 @@
             <select id="countrySelect" class="search-country">
               <option value="">全部国家</option>
             </select>
-            <input id="nearInput" class="search-near" placeholder="位置（城市/邮编，如 Worms）" />
+            <input id="nearInput" class="search-near" list="cityHints" placeholder="位置（城市/邮编，如 Worms）" />
+            <datalist id="cityHints"></datalist>
             <select id="radiusKmSelect" class="search-radius">
               <option value="10">+ 10 km</option>
               <option value="20" selected>+ 20 km</option>

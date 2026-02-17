@@ -147,12 +147,20 @@ function renderRows(items) {
 async function loadMeta() {
   const data = await api("/api/meta");
   const sel = $("countrySelect");
+  const cityHints = $("cityHints");
   sel.innerHTML = `<option value="">\u5168\u90e8\u56fd\u5bb6</option>`;
   data.countries.forEach((c) => {
     const opt = document.createElement("option");
     opt.value = c;
     opt.textContent = c;
     sel.appendChild(opt);
+  });
+
+  cityHints.innerHTML = "";
+  (data.cities || []).forEach((city) => {
+    const opt = document.createElement("option");
+    opt.value = city;
+    cityHints.appendChild(opt);
   });
 }
 
