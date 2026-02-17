@@ -156,7 +156,10 @@ button.accent { background: #0b7a75; }
   margin-bottom: 10px;
 }
 
-.table-wrap { overflow: auto; }
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+}
 
 table {
   width: 100%;
@@ -175,7 +178,7 @@ th {
   background: #f1f6f1;
   position: sticky;
   top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h));
-  z-index: 20;
+  z-index: 50;
 }
 
 .pager {
