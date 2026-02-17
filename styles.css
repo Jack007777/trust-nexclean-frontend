@@ -8,8 +8,8 @@
   --btn: #0f6b67;
   --btn-2: #0b5a57;
   --sticky-top: 8px;
-  --sticky-search-h: 120px;
-  --sticky-meta-h: 56px;
+  --sticky-search-h: 0px;
+  --sticky-meta-h: 0px;
 }
 
 * { box-sizing: border-box; }
@@ -154,8 +154,9 @@ button.accent { background: #0b7a75; }
 
 .table-wrap {
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: auto;
   position: relative;
+  max-height: calc(100vh - 210px);
 }
 
 table {
@@ -173,14 +174,16 @@ th, td {
 }
 
 #customersTable thead {
-  position: static;
+  position: sticky;
+  top: 0;
+  z-index: 160;
 }
 
 th {
   background: #f1f6f1;
   position: sticky;
   top: 0;
-  z-index: 120;
+  z-index: 170;
 }
 
 .pager {
@@ -260,10 +263,6 @@ menu {
 }
 
 @media (max-width: 1000px) {
-  :root {
-    --sticky-search-h: 320px;
-    --sticky-meta-h: 64px;
-  }
   .search-main {
     grid-template-columns: 1fr;
     border-radius: 12px;
@@ -283,6 +282,9 @@ menu {
   }
   .grid {
     grid-template-columns: 1fr;
+  }
+  .table-wrap {
+    max-height: calc(100vh - 240px);
   }
 }
 
