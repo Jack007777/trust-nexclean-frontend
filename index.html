@@ -72,6 +72,7 @@
                 <th>国家</th>
                 <th>城市</th>
                 <th>邮编</th>
+                <th>匹配度</th>
                 <th>Trust直接客户</th>
                 <th>业务描述</th>
                 <th>备注</th>
@@ -106,6 +107,16 @@
           <label>街道<input name="street" /></label>
           <label>城市<input name="city" /></label>
           <label>邮编<input name="postcode" /></label>
+          <label>匹配度
+            <select name="match_score">
+              <option value="0">0星</option>
+              <option value="1">1星</option>
+              <option value="2">2星</option>
+              <option value="3">3星</option>
+              <option value="4">4星</option>
+              <option value="5">5星</option>
+            </select>
+          </label>
           <label><input name="trust_direct_customer" type="checkbox" /> Trust直接客户</label>
           <label class="full">地点<input name="location" /></label>
           <label>来源文件<input name="source_file" /></label>
