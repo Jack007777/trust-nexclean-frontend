@@ -157,11 +157,24 @@ async function loadMeta() {
 }
 
 async function resolveCenterFromNear(nearText) {
-  const u = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(nearText)}`;
-  const res = await fetch(u, { headers: { "Accept-Language": "en" } });
-  const data = await res.json();
-  if (!data.length) return null;
-  return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+  const countryRaw = ($("countrySelect").value || "").trim();
+  const countryMap = {
+    "德国": "Germany",
+    "Deutschland": "Germany",
+    "Germany": "Germany",
+    "奥地利": "Austria",
+    "Österreich": "Austria",
+    "Austria": "Austria",
+    "瑞士": "Switzerland",
+    "Schweiz": "Switzerland",
+    "Switzerland": "Switzerland",
+  };
+  const country = countryMap[countryRaw] || countryRaw || "";
+  const qs = new URLSearchParams({ near: nearText });
+  if (country) qs.set("country", country);
+  const data = await api(`/api/geo/resolve?${qs.toString()}`);
+  if (!data.found) return null;
+  return { lat: Number(data.lat), lng: Number(data.lng) };
 }
 
 async function loadData() {
@@ -199,25 +212,29 @@ function bindEvents() {
   $("logoutBtn").onclick = () => logout();
 
   $("searchBtn").onclick = async () => {
-    state.search = $("searchInput").value.trim();
-    state.country = $("countrySelect").value;
-    state.nearText = $("nearInput").value.trim();
-    state.radiusKm = $("radiusKmSelect").value || "20";
+    try {
+      state.search = $("searchInput").value.trim();
+      state.country = $("countrySelect").value;
+      state.nearText = $("nearInput").value.trim();
+      state.radiusKm = $("radiusKmSelect").value || "20";
 
-    state.centerLat = "";
-    state.centerLng = "";
-    if (state.nearText) {
-      const p = await resolveCenterFromNear(state.nearText);
-      if (!p) {
-        alert("\u672a\u627e\u5230\u4f4d\u7f6e\uff0c\u8bf7\u6362\u4e2a\u5173\u952e\u8bcd");
-        return;
+      state.centerLat = "";
+      state.centerLng = "";
+      if (state.nearText) {
+        const p = await resolveCenterFromNear(state.nearText);
+        if (!p) {
+          alert("\u672a\u627e\u5230\u4f4d\u7f6e\uff0c\u8bf7\u6362\u4e2a\u5173\u952e\u8bcd");
+          return;
+        }
+        state.centerLat = String(p.lat);
+        state.centerLng = String(p.lng);
       }
-      state.centerLat = String(p.lat);
-      state.centerLng = String(p.lng);
-    }
 
-    state.page = 1;
-    await loadData();
+      state.page = 1;
+      await loadData();
+    } catch (e) {
+      alert(`\u641c\u7d22\u5931\u8d25: ${e.message || e}`);
+    }
   };
 
   $("resetBtn").onclick = async () => {
