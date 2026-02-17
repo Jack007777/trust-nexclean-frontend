@@ -154,9 +154,8 @@ button.accent { background: #0b7a75; }
 
 .table-wrap {
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: visible;
   position: relative;
-  max-height: calc(100vh - 210px);
 }
 
 table {
@@ -174,16 +173,12 @@ th, td {
 }
 
 #customersTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 160;
+  position: static;
 }
 
 th {
   background: #f1f6f1;
-  position: sticky;
-  top: 0;
-  z-index: 170;
+  position: static;
 }
 
 .pager {
@@ -282,9 +277,6 @@ menu {
   }
   .grid {
     grid-template-columns: 1fr;
-  }
-  .table-wrap {
-    max-height: calc(100vh - 240px);
   }
 }
 
