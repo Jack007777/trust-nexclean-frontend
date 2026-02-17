@@ -16,6 +16,7 @@ const state = {
   radiusKm: "",
   missingGeoOnly: false,
   editingId: null,
+  commCustomerId: null,
 };
 
 let map;
@@ -23,6 +24,15 @@ let mapMarker;
 let pickedLatLng = null;
 
 const $ = (id) => document.getElementById(id);
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
 
 function fullUrl(path) {
   return `${API_BASE}${path}`;
@@ -131,6 +141,7 @@ function renderRows(items) {
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
+        <button data-id="${item.id}" data-act="comm">Comm</button>
         <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
         <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>\u5220\u9664</button>
       </td>
@@ -283,6 +294,9 @@ function bindEvents() {
       fillForm(detail.item);
       $("editorDialog").showModal();
     }
+    if (btn.dataset.act === "comm") {
+      await openCommDialog(id);
+    }
     if (btn.dataset.act === "del") {
       if (!confirm("\u786e\u8ba4\u5220\u9664\u8fd9\u6761\u8bb0\u5f55\uff1f")) return;
       await api(`/api/customers/${id}`, { method: "DELETE" });
@@ -316,6 +330,77 @@ function bindEvents() {
   $("mapCloseBtn").onclick = () => $("mapDialog").close();
   $("mapSearchBtn").onclick = async () => mapSearch();
   $("mapUseBtn").onclick = () => applyPickedLatLng();
+
+  $("commCloseBtn").onclick = () => $("commDialog").close();
+  $("commForm").onsubmit = async (e) => {
+    e.preventDefault();
+    if (!state.commCustomerId) return;
+    const payload = {
+      channel: $("commChannel").value.trim() || null,
+      contact_name: $("commContact").value.trim() || null,
+      subject: $("commSubject").value.trim() || null,
+      content: $("commContent").value.trim() || null,
+      happened_at: $("commHappenedAt").value.trim() || null,
+      next_follow_up_at: $("commFollowUpAt").value.trim() || null,
+    };
+    if (!payload.subject && !payload.content) {
+      alert("\u8bf7\u586b\u5199\u4e3b\u9898\u6216\u5185\u5bb9");
+      return;
+    }
+    await api(`/api/customers/${state.commCustomerId}/communications`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    $("commSubject").value = "";
+    $("commContent").value = "";
+    $("commFollowUpAt").value = "";
+    await loadCommunications();
+  };
+}
+
+async function openCommDialog(customerId) {
+  state.commCustomerId = customerId;
+  const detail = await api(`/api/customers/${customerId}`);
+  const title = detail?.item?.company_name || `#${customerId}`;
+  $("commTitle").textContent = `\u5ba2\u6237\u6c9f\u901a\u8bb0\u5f55 - ${title}`;
+  if (!$("commHappenedAt").value) {
+    $("commHappenedAt").value = new Date().toISOString().slice(0, 19);
+  }
+  $("commDialog").showModal();
+  await loadCommunications();
+}
+
+function renderCommunications(items) {
+  const box = $("commList");
+  if (!items.length) {
+    box.innerHTML = `<div class="hint">\u6682\u65e0\u8bb0\u5f55</div>`;
+    return;
+  }
+  box.innerHTML = items
+    .map(
+      (r) => `
+      <article class="comm-item">
+        <div class="comm-head">
+          <strong>${escapeHtml(r.subject || "(no subject)")}</strong>
+          <span>${escapeHtml(r.happened_at || "")}</span>
+        </div>
+        <div class="comm-meta">
+          <span>channel: ${escapeHtml(r.channel || "-")}</span>
+          <span>contact: ${escapeHtml(r.contact_name || "-")}</span>
+          <span>by: ${escapeHtml(r.created_by || "-")}</span>
+          <span>next: ${escapeHtml(r.next_follow_up_at || "-")}</span>
+        </div>
+        <div class="comm-content">${escapeHtml(r.content || "")}</div>
+      </article>
+    `
+    )
+    .join("");
+}
+
+async function loadCommunications() {
+  if (!state.commCustomerId) return;
+  const data = await api(`/api/customers/${state.commCustomerId}/communications?limit=200`);
+  renderCommunications(data.items || []);
 }
 
 async function initApp() {

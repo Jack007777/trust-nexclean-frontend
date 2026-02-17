@@ -117,6 +117,25 @@
       </form>
     </dialog>
 
+    <dialog id="commDialog">
+      <form id="commForm" method="dialog">
+        <h3 id="commTitle">Customer Communications</h3>
+        <div class="grid">
+          <label>Channel<input id="commChannel" placeholder="email / phone / meeting" /></label>
+          <label>Contact<input id="commContact" placeholder="name" /></label>
+          <label class="full">Subject<input id="commSubject" placeholder="subject" /></label>
+          <label class="full">Content<textarea id="commContent" rows="4" placeholder="communication details"></textarea></label>
+          <label>Happened At<input id="commHappenedAt" placeholder="2026-02-17T10:30:00" /></label>
+          <label>Next Follow-up<input id="commFollowUpAt" placeholder="2026-02-25T09:00:00" /></label>
+        </div>
+        <menu>
+          <button id="commCloseBtn" type="button" class="secondary">Close</button>
+          <button id="commSaveBtn" value="default">Add Record</button>
+        </menu>
+      </form>
+      <section id="commList" class="comm-list"></section>
+    </dialog>
+
     <dialog id="mapDialog">
       <div class="map-toolbar">
         <input id="mapSearchInput" placeholder="搜索地点（如 Berlin, Germany）" />
