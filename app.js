@@ -104,6 +104,7 @@ function fillForm(item) {
     "website",
     "email",
     "lead_source",
+    "business_description",
     "country",
     "street",
     "city",
@@ -138,6 +139,7 @@ function renderRows(items) {
       <td>${item.city || ""}</td>
       <td>${item.postcode || ""}</td>
       <td>${item.trust_direct_customer ? "是" : ""}</td>
+      <td>${item.business_description || ""}</td>
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
