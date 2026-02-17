@@ -144,6 +144,7 @@ function renderRows(items) {
       <td>${item.source_file || ""}</td>
       <td>
         <button data-id="${item.id}" data-act="comm">\u6c9f\u901a\u8bb0\u5f55</button>
+        <button data-id="${item.id}" data-act="split" ${canEdit ? "" : "disabled"}>\u62c6\u5206\u7ad9\u70b9</button>
         <button data-id="${item.id}" data-act="edit" ${canEdit ? "" : "disabled"}>\u7f16\u8f91</button>
         <button data-id="${item.id}" data-act="del" class="secondary" ${canDelete ? "" : "disabled"}>\u5220\u9664</button>
       </td>
@@ -263,14 +264,7 @@ function bindEvents() {
       }
 
       state.page = 1;
-      const first = await loadData();
-
-      if (state.nearText && state.country && first.total === 0) {
-        const countryBak = state.country;
-        state.country = "";
-        const second = await loadData();
-        $("stats").textContent = `\u603b\u8ba1 ${second.total} \u6761 | \u4f4d\u7f6e ${state.nearText} \u00b1 ${state.radiusKm} km | \u5df2\u5ffd\u7565\u56fd\u5bb6\u7b5b\u9009(${countryBak})`;
-      }
+      await loadData();
     } catch (e) {
       $("stats").textContent = `\u641c\u7d22\u5931\u8d25: ${e.message || e}`;
       alert(`\u641c\u7d22\u5931\u8d25: ${e.message || e}`);
@@ -332,6 +326,23 @@ function bindEvents() {
       $("dialogTitle").textContent = "\u7f16\u8f91\u5ba2\u6237";
       fillForm(detail.item);
       $("editorDialog").showModal();
+      return;
+    }
+
+    if (btn.dataset.act === "split") {
+      const raw = prompt("\u8f93\u5165\u8981\u62c6\u5206\u7684\u603b\u7ad9\u70b9\u6570\uff08\u4f8b\u5982 4\uff09", "4");
+      if (!raw) return;
+      const totalSites = Number(raw);
+      if (!Number.isInteger(totalSites) || totalSites < 2 || totalSites > 50) {
+        alert("\u8bf7\u8f93\u5165 2-50 \u7684\u6574\u6570");
+        return;
+      }
+      await api(`/api/customers/${id}/split-sites`, {
+        method: "POST",
+        body: JSON.stringify({ total_sites: totalSites }),
+      });
+      alert(`\u5df2\u62c6\u5206\u4e3a ${totalSites} \u4e2a\u7ad9\u70b9\uff08\u4fdd\u7559\u539f\u8bb0\u5f55\uff0c\u65b0\u589e ${totalSites - 1} \u6761\uff09`);
+      await loadData();
       return;
     }
 
