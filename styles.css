@@ -99,6 +99,19 @@ main {
   margin-top: 10px;
   display: flex;
   gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.checkline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #102a12;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 6px 10px;
+  border-radius: 8px;
 }
 
 input,

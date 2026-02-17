@@ -15,6 +15,7 @@ const state = {
   centerLat: "",
   centerLng: "",
   radiusKm: "20",
+  includeTrustDirect: false,
   editingId: null,
   commCustomerId: null,
 };
@@ -90,6 +91,7 @@ function collectForm() {
   data.source_row = data.source_row ? Number(data.source_row) : 0;
   data.latitude = data.latitude ? Number(data.latitude) : null;
   data.longitude = data.longitude ? Number(data.longitude) : null;
+  data.trust_direct_customer = !!form.elements["trust_direct_customer"].checked;
   return data;
 }
 
@@ -116,6 +118,7 @@ function fillForm(item) {
   ]) {
     form.elements[k].value = item?.[k] ?? "";
   }
+  form.elements["trust_direct_customer"].checked = !!item?.trust_direct_customer;
 }
 
 function renderRows(items) {
@@ -132,6 +135,7 @@ function renderRows(items) {
       <td>${item.phone || ""}</td>
       <td>${item.email || ""}</td>
       <td>${item.country || ""}</td>
+      <td>${item.trust_direct_customer ? "是" : ""}</td>
       <td>${item.note || ""}</td>
       <td>${item.source_file || ""}</td>
       <td>
@@ -193,6 +197,7 @@ async function loadData() {
   });
   if (state.search) qs.set("search", state.search);
   if (state.country) qs.set("country", state.country);
+  if (state.includeTrustDirect) qs.set("include_trust_direct", "true");
   if (state.centerLat && state.centerLng && state.radiusKm) {
     qs.set("center_lat", state.centerLat);
     qs.set("center_lng", state.centerLng);
@@ -204,6 +209,9 @@ async function loadData() {
   let msg = `\u603b\u8ba1 ${data.total} \u6761`;
   if (state.nearText) {
     msg += ` | \u4f4d\u7f6e ${state.nearText} \u00b1 ${state.radiusKm} km`;
+  }
+  if (state.includeTrustDirect) {
+    msg += " | 含Trust直接客户";
   }
   if (data.total === 0) {
     msg += " | \u672a\u627e\u5230\u5339\u914d\u5ba2\u6237";
@@ -235,6 +243,7 @@ function bindEvents() {
       state.country = $("countrySelect").value;
       state.nearText = $("nearInput").value.trim();
       state.radiusKm = $("radiusKmSelect").value || "20";
+      state.includeTrustDirect = $("includeTrustDirectInput").checked;
 
       state.centerLat = "";
       state.centerLng = "";
@@ -269,12 +278,14 @@ function bindEvents() {
     $("countrySelect").value = "";
     $("nearInput").value = "";
     $("radiusKmSelect").value = "20";
+    $("includeTrustDirectInput").checked = false;
     state.search = "";
     state.country = "";
     state.nearText = "";
     state.centerLat = "";
     state.centerLng = "";
     state.radiusKm = "20";
+    state.includeTrustDirect = false;
     state.page = 1;
     await loadData();
   };

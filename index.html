@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Trust Customers</title>
-    <link rel="stylesheet" href="./styles.css?v=20260217b" />
+    <link rel="stylesheet" href="./styles.css?v=20260217c" />
   </head>
   <body>
     <header class="topbar">
@@ -50,6 +50,7 @@
             <button id="searchBtn" class="find-btn">搜索</button>
           </div>
           <div class="search-actions">
+            <label class="checkline"><input id="includeTrustDirectInput" type="checkbox" /> Trust直接客户</label>
             <button id="resetBtn" class="secondary">重置</button>
             <button id="addBtn" class="accent">新增客户</button>
           </div>
@@ -69,6 +70,7 @@
                 <th>电话</th>
                 <th>邮箱</th>
                 <th>国家</th>
+                <th>Trust直接客户</th>
                 <th>备注</th>
                 <th>来源</th>
                 <th>操作</th>
@@ -100,6 +102,7 @@
           <label>街道<input name="street" /></label>
           <label>城市<input name="city" /></label>
           <label>邮编<input name="postcode" /></label>
+          <label><input name="trust_direct_customer" type="checkbox" /> Trust直接客户</label>
           <label class="full">地点<input name="location" /></label>
           <label>来源文件<input name="source_file" /></label>
           <label>工作表<input name="sheet_name" /></label>
@@ -135,7 +138,7 @@
       <section id="commList" class="comm-list"></section>
     </dialog>
 
-    <script src="./config.js?v=20260217b"></script>
-    <script src="./app.js?v=20260217b"></script>
+    <script src="./config.js?v=20260217c"></script>
+    <script src="./app.js?v=20260217c"></script>
   </body>
 </html>
