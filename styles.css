@@ -8,7 +8,7 @@
   --btn: #0f6b67;
   --btn-2: #0b5a57;
   --sticky-top: 8px;
-  --sticky-search-h: 102px;
+  --sticky-search-h: 120px;
   --sticky-meta-h: 56px;
 }
 
@@ -55,11 +55,15 @@ main {
   border: none;
   background: linear-gradient(0deg, var(--green), #9adc3f);
   padding: 10px;
-  position: static;
+  position: sticky;
+  top: var(--sticky-top);
+  z-index: 220;
 }
 
 .meta {
-  position: static;
+  position: sticky;
+  top: calc(var(--sticky-top) + var(--sticky-search-h) + 8px);
+  z-index: 200;
 }
 .search-main {
   background: #fff;
@@ -155,11 +159,13 @@ button.accent { background: #0b7a75; }
 .table-wrap {
   overflow-x: auto;
   overflow-y: visible;
+  position: relative;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 th, td {
@@ -170,11 +176,17 @@ th, td {
   font-size: 13px;
 }
 
+#customersTable thead {
+  position: sticky;
+  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h) + 16px);
+  z-index: 170;
+}
+
 th {
   background: #f1f6f1;
   position: sticky;
-  top: 0;
-  z-index: 80;
+  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h) + 16px);
+  z-index: 180;
 }
 
 .pager {
@@ -256,7 +268,7 @@ menu {
 @media (max-width: 1000px) {
   :root {
     --sticky-search-h: 320px;
-    --sticky-meta-h: 56px;
+    --sticky-meta-h: 64px;
   }
   .search-main {
     grid-template-columns: 1fr;

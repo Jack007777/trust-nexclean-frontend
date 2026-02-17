@@ -158,10 +158,12 @@ function refreshStickyOffsets() {
   const root = document.documentElement;
   const topPx = 8;
   const search = document.querySelector(".search-strip");
+  const meta = document.querySelector(".meta");
   const searchH = search ? Math.ceil(search.getBoundingClientRect().height) : 0;
+  const metaH = meta ? Math.ceil(meta.getBoundingClientRect().height) : 0;
   root.style.setProperty("--sticky-top", `${topPx}px`);
   root.style.setProperty("--sticky-search-h", `${searchH}px`);
-  root.style.setProperty("--sticky-meta-h", `0px`);
+  root.style.setProperty("--sticky-meta-h", `${metaH}px`);
 }
 
 async function loadMeta() {
