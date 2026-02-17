@@ -287,6 +287,18 @@ function bindEvents() {
     await loadData();
   };
 
+  $("includeTrustDirectInput").onchange = async () => {
+    try {
+      $("stats").textContent = "正在搜索...";
+      state.includeTrustDirect = $("includeTrustDirectInput").checked;
+      state.page = 1;
+      await loadData();
+    } catch (e) {
+      $("stats").textContent = `搜索失败: ${e.message || e}`;
+      alert(`搜索失败: ${e.message || e}`);
+    }
+  };
+
   $("prevBtn").onclick = async () => {
     if (state.page > 1) {
       state.page--;
