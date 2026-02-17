@@ -91,7 +91,7 @@ function collectForm() {
   data.source_row = data.source_row ? Number(data.source_row) : 0;
   data.latitude = data.latitude ? Number(data.latitude) : null;
   data.longitude = data.longitude ? Number(data.longitude) : null;
-  data.match_score = data.match_score ? Number(data.match_score) : 0;
+  data.match_score = data.match_score === "" ? null : Number(data.match_score);
   data.trust_direct_customer = !!form.elements["trust_direct_customer"].checked;
   return data;
 }
@@ -139,7 +139,7 @@ function renderRows(items) {
       <td>${item.country_group || item.country || ""}</td>
       <td>${item.city || ""}</td>
       <td>${item.postcode || ""}</td>
-      <td>${Number(item.match_score || 0)}星</td>
+      <td>${item.match_score === null || item.match_score === undefined || item.match_score === "" ? "" : `${Number(item.match_score)}星`}</td>
       <td>${item.trust_direct_customer ? "是" : ""}</td>
       <td>${item.business_description || ""}</td>
       <td>${item.note || ""}</td>
