@@ -55,15 +55,11 @@ main {
   border: none;
   background: linear-gradient(0deg, var(--green), #9adc3f);
   padding: 10px;
-  position: sticky;
-  top: var(--sticky-top);
-  z-index: 220;
+  position: static;
 }
 
 .meta {
-  position: sticky;
-  top: calc(var(--sticky-top) + var(--sticky-search-h) + 8px);
-  z-index: 200;
+  position: static;
 }
 .search-main {
   background: #fff;
@@ -177,16 +173,14 @@ th, td {
 }
 
 #customersTable thead {
-  position: sticky;
-  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h) + 16px);
-  z-index: 170;
+  position: static;
 }
 
 th {
   background: #f1f6f1;
   position: sticky;
-  top: calc(var(--sticky-top) + var(--sticky-search-h) + var(--sticky-meta-h) + 16px);
-  z-index: 180;
+  top: 0;
+  z-index: 120;
 }
 
 .pager {
